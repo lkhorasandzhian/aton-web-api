@@ -23,13 +23,31 @@ namespace AtonWebAPI
 			: base(options, logger, encoder, clock)
 		{
 			_context = context;
+
+			var existingAdmin = _context.Users.FirstOrDefault(u => u.Login == "admin");
+
+			if (existingAdmin == null)
+			{
+				var admin = new User
+				{
+					Login = "admin",
+					Password = "admin123",
+					Name = "Администратор",
+					Gender = 2,
+					Admin = true,
+					Birthday = DateTime.Now.AddYears(-20)
+				};
+
+				_context.Users.Add(admin);
+				_context.SaveChanges();
+			}
 		}
 
 		protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
 		{
 			if (!Request.Headers.ContainsKey("Authorization"))
 			{
-				return AuthenticateResult.Fail("Missing Authorization Header");
+				return AuthenticateResult.NoResult();
 			}
 
 			try
@@ -40,7 +58,7 @@ namespace AtonWebAPI
 				var username = credentials[0];
 				var password = credentials[1];
 
-				var user = await _context.Users.SingleOrDefaultAsync(u => u.Login == username && u.Password == password);
+				var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == username && u.Password == password);
 
 				if (user == null)
 				{
@@ -49,9 +67,15 @@ namespace AtonWebAPI
 
 				var claims = new[]
 				{
-				new Claim(ClaimTypes.NameIdentifier, user.Login),
-				new Claim(ClaimTypes.Name, user.Name),
-			};
+					new Claim(ClaimTypes.NameIdentifier, user.Login),
+					new Claim(ClaimTypes.Name, user.Name),
+				};
+
+				// If user was marked as Admin, then give permission.
+				if (user.Admin) {
+					_ = claims.Append(new Claim(ClaimTypes.Role, "Administrator"));
+				}
+
 				var identity = new ClaimsIdentity(claims, Scheme.Name);
 				var principal = new ClaimsPrincipal(identity);
 				var ticket = new AuthenticationTicket(principal, Scheme.Name);

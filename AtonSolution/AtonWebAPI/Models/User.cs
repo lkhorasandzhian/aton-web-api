@@ -5,7 +5,7 @@ namespace AtonWebAPI.Models
 	public class User
 	{
 		[Key]
-		public readonly Guid Guid = Guid.NewGuid();
+		public Guid Guid { get; set; } = Guid.NewGuid();
 
 		[Required(ErrorMessage = "Login is required")]
 		[RegularExpression("^[a-zA-Z0-9]*$", ErrorMessage = "Login must contain only Latin letters and numbers")]
@@ -26,7 +26,7 @@ namespace AtonWebAPI.Models
 		[Required]
 		public DateTime? Birthday { get; set; }
 
-		private bool _admin;
+		public bool Admin { get; set; }
 
 		private DateTime _createdOn;
 		private string _createdBy = string.Empty;

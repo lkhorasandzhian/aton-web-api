@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AtonWebAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AtonWebAPI.Controllers
 {
@@ -19,6 +20,20 @@ namespace AtonWebAPI.Controllers
 		public async Task<ActionResult<IEnumerable<User>>> GetUsers()
 		{
 			return await _context.Users.ToListAsync();
+		}
+
+		[HttpPost("Register")]
+		[Authorize(Roles = "Administrator")]
+		public async Task<ActionResult<User>> RegisterUser([FromForm] User user)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			_context.Users.Add(user);
+			await _context.SaveChangesAsync();
+			return CreatedAtAction(nameof(GetUsers), new { id = user.Guid }, user);
 		}
 	}
 }
