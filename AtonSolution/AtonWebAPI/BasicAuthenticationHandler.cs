@@ -72,7 +72,8 @@ namespace AtonWebAPI
 				};
 
 				// If user was marked as Admin, then give permission.
-				if (user.Admin) {
+				if (user.Admin)
+				{
 					_ = claims.Append(new Claim(ClaimTypes.Role, "Administrator"));
 				}
 
