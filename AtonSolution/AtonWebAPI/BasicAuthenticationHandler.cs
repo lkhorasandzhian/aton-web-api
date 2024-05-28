@@ -34,8 +34,10 @@ namespace AtonWebAPI
 					Password = "admin123",
 					Name = "Администратор",
 					Gender = 2,
+					Birthday = DateTime.Now.AddYears(-20),
 					Admin = true,
-					Birthday = DateTime.Now.AddYears(-20)
+					CreatedOn = DateTime.Now,
+					CreatedBy = string.Empty
 				};
 
 				_context.Users.Add(admin);
