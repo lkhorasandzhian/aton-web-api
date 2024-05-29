@@ -11,6 +11,9 @@ builder.Services.AddDbContext<StorageContext>(opt => opt.UseInMemoryDatabase("Us
 builder.Services.AddAuthentication("BasicAuthentication")
 	.AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
+builder.Services.AddAuthorizationBuilder()
+	.AddPolicy("Administrator", policy => policy.RequireRole("Administrator"));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

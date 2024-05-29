@@ -33,8 +33,7 @@ namespace AtonWebAPI.Controllers
 				return BadRequest(ModelState);
 			}
 
-			// Получаем логин текущего авторизованного пользователя
-			string? creatorLogin = User.FindFirst(ClaimTypes.Name)?.Value;
+			string? creatorLogin = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
 			if (string.IsNullOrEmpty(creatorLogin))
 			{

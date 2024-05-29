@@ -57,10 +57,10 @@ namespace AtonWebAPI
 				var authHeader = AuthenticationHeaderValue.Parse(Request.Headers.Authorization!);
 				var credentialBytes = Convert.FromBase64String(authHeader.Parameter!);
 				var credentials = Encoding.UTF8.GetString(credentialBytes).Split([':'], 2);
-				var username = credentials[0];
-				var password = credentials[1];
+				var login = credentials.FirstOrDefault();
+				var password = credentials.LastOrDefault();
 
-				var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == username && u.Password == password);
+				var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == login && u.Password == password);
 
 				if (user == null)
 				{
@@ -71,13 +71,8 @@ namespace AtonWebAPI
 				{
 					new Claim(ClaimTypes.NameIdentifier, user.Login),
 					new Claim(ClaimTypes.Name, user.Name),
+					new Claim(ClaimTypes.Role, user.Admin ? "Administrator" : "User")
 				};
-
-				// If user was marked as Admin, then give permission.
-				if (user.Admin)
-				{
-					_ = claims.Append(new Claim(ClaimTypes.Role, "Administrator"));
-				}
 
 				var identity = new ClaimsIdentity(claims, Scheme.Name);
 				var principal = new ClaimsPrincipal(identity);
