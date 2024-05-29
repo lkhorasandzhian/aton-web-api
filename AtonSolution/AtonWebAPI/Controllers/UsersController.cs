@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using AtonWebAPI.Models.Validations;
 using System.Security.Claims;
+using System.Net;
 
 namespace AtonWebAPI.Controllers
 {
@@ -25,7 +26,6 @@ namespace AtonWebAPI.Controllers
 		}
 
 		[HttpPost("Register")]
-		[Authorize(Roles = "Administrator")]
 		public async Task<ActionResult<User>> RegisterUser([FromForm] Registration registration)
 		{
 			if (!ModelState.IsValid)
@@ -38,6 +38,9 @@ namespace AtonWebAPI.Controllers
 			if (string.IsNullOrEmpty(creatorLogin))
 			{
 				return Unauthorized("Unable to identify the creator of the user");
+			} else if (registration.Admin && !User.IsInRole("Administrator"))
+			{
+				return StatusCode(StatusCodes.Status403Forbidden, "You don't have permission to assign Administrator status to a new user");
 			}
 
 			var user = registration.CreateUserByGivenData(creatorLogin);
