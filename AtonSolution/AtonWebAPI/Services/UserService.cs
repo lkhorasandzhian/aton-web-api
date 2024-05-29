@@ -12,7 +12,21 @@ namespace AtonWebAPI.Services
 			_context = context;
 		}
 
+		public async Task<List<User>> GetUsersAsync()
+		{
+			return await _context.Users.ToListAsync();
+		}
+
 		public async Task<User?> AuthenticateAsync(string? login, string? password) =>
 			await _context.Users.SingleOrDefaultAsync(u => u.Login == login && u.Password == password);
+
+		public async Task<int> AddUserAsync(User user)
+		{
+			_context.Users.Add(user);
+			return await _context.SaveChangesAsync();
+		}
+
+		public async Task<User?> GetUserByLoginAsync(string? login) =>
+			await _context.Users.SingleOrDefaultAsync(u =>u.Login == login);
 	}
 }
