@@ -1,5 +1,6 @@
 using AtonWebAPI;
 using AtonWebAPI.Models;
+using AtonWebAPI.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -7,6 +8,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddDbContext<StorageContext>(opt => opt.UseInMemoryDatabase("UserList"));
 builder.Services.AddAuthentication("BasicAuthentication")
 	.AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
@@ -58,5 +60,29 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Database initialization.
+using (var scope = app.Services.CreateScope())
+{
+	var context = scope.ServiceProvider.GetRequiredService<StorageContext>();
+
+	if (!context.Users.Any())
+	{
+		var admin = new User
+		{
+			Login = "admin",
+			Password = "admin123",
+			Name = "Администратор",
+			Gender = 2,
+			Birthday = DateTime.Now.AddYears(-20),
+			Admin = true,
+			CreatedOn = DateTime.Now,
+			CreatedBy = string.Empty
+		};
+
+		context.Users.Add(admin);
+		context.SaveChanges();
+	}
+}
 
 app.Run();

@@ -4,14 +4,13 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
-using AtonWebAPI.Models;
-using Microsoft.EntityFrameworkCore;
+using AtonWebAPI.Services;
 
 namespace AtonWebAPI
 {
 	public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 	{
-		private readonly StorageContext _context;
+		private readonly IUserService _service;
 
 		[Obsolete(message: "ISystemClock type is obsolete. Should be changed to TimeProvider")]
 		public BasicAuthenticationHandler(
@@ -19,30 +18,10 @@ namespace AtonWebAPI
 			ILoggerFactory logger,
 			UrlEncoder encoder,
 			ISystemClock clock,
-			StorageContext context)
+			IUserService service)
 			: base(options, logger, encoder, clock)
 		{
-			_context = context;
-
-			var existingAdmin = _context.Users.FirstOrDefault(u => u.Login == "admin");
-
-			if (existingAdmin == null)
-			{
-				var admin = new User
-				{
-					Login = "admin",
-					Password = "admin123",
-					Name = "Администратор",
-					Gender = 2,
-					Birthday = DateTime.Now.AddYears(-20),
-					Admin = true,
-					CreatedOn = DateTime.Now,
-					CreatedBy = string.Empty
-				};
-
-				_context.Users.Add(admin);
-				_context.SaveChanges();
-			}
+			_service = service;
 		}
 
 		protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -60,7 +39,7 @@ namespace AtonWebAPI
 				var login = credentials.FirstOrDefault();
 				var password = credentials.LastOrDefault();
 
-				var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == login && u.Password == password);
+				var user = await _service.AuthenticateAsync(login, password);
 
 				if (user == null)
 				{
