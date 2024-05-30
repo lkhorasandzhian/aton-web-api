@@ -37,5 +37,8 @@ namespace AtonWebAPI.Services
 
 		public async Task<User?> GetUserByLoginAndPasswordAsync(string? login, string? password) =>
 			await _context.Users.SingleOrDefaultAsync(u => u.Login == login && u.Password == password);
+
+		public async Task<List<User>?> GetUsersOverSpecifiedAgeAsync(int age) =>
+			await _context.Users.Where(u => DateTime.Compare(u.Birthday, DateTime.Now.AddYears(-(age + 1))) < 0).ToListAsync();
 	}
 }

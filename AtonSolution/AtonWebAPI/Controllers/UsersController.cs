@@ -91,6 +91,13 @@ namespace AtonWebAPI.Controllers
 				NotFound();
 		}
 
+		/// <summary>
+		/// 7) Запрос пользователя по логину и паролю (доступно только самому пользователю,
+		/// если он активен (отсутствует RevokedOn)).
+		/// </summary>
+		/// <param name="login"> Логин запрошенного пользователя. </param>
+		/// <param name="password"> Пароль запрошенного пользователя. </param>
+		/// <returns> Личный профиль пользователя. </returns>
 		[Authorize(Roles = "User")]
 		[HttpGet("Request_personal_profile")]
 		public async Task<ActionResult<User>> RequestPersonalProfile(
@@ -109,6 +116,23 @@ namespace AtonWebAPI.Controllers
 			}
 
 			return Ok(requestedUser);
+		}
+
+		/// <summary>
+		/// 8) Запрос всех пользователей старше определённого возраста (доступно Админам).
+		/// </summary>
+		/// <param name="age"> Запрошенный возраст. </param>
+		/// <returns> Пользователи старше указанного возраста. </returns>
+		[Authorize(Roles = "Administrator")]
+		[HttpGet("Request_users_over_specified_age")]
+		public async Task<ActionResult<List<User>?>> RequestUsersOverSpecifiedAge([FromQuery, Required] int age)
+		{
+			if (age <= 0)
+			{
+				return BadRequest("Age must be greater than zero");
+			}
+
+			return await _userService.GetUsersOverSpecifiedAgeAsync(age);
 		}
 	}
 }
