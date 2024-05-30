@@ -45,6 +45,10 @@ namespace AtonWebAPI
 				{
 					return AuthenticateResult.Fail("Invalid Username or Password");
 				}
+				else if (user.RevokedOn != null)
+				{
+					return AuthenticateResult.Fail($"User was revoked on {user.RevokedOn}");
+				}
 
 				var claims = new List<Claim>()
 				{
