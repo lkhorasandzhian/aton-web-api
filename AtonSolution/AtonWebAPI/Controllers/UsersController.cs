@@ -27,6 +27,12 @@ namespace AtonWebAPI.Controllers
 		}
 #endif
 
+		/// <summary>
+		/// 1) Создание пользователя по логину, паролю, имени, полу и дате рождения
+		/// + указание будет ли пользователь админом (доступно админам).
+		/// </summary>
+		/// <param name="registration"> Введенные пользователем регистрационные данные из Swagger UI. </param>
+		/// <returns> Зарегистрированный пользовательский профиль. </returns>
 		[HttpPost("Register")]
 		public async Task<ActionResult<User>> Register([FromForm] Registration registration)
 		{
@@ -53,12 +59,26 @@ namespace AtonWebAPI.Controllers
 			return CreatedAtAction(nameof(RequestByLogin), new { id = user.Guid }, user);
 		}
 
+		/// <summary>
+		/// 6) Запрос пользователя по логину. В списке должны быть имя, пол,
+		/// дата рождения и статус активный или нет (доступно админам).
+		/// </summary>
+		/// <param name="login"> Запрошенный логин. </param>
+		/// <returns> Имя, пол, дата рождения, статус активности.  </returns>
 		[Authorize(Roles = "Administrator")]
 		[HttpGet("Request_by_login")]
 		public async Task<ActionResult<User>> RequestByLogin([FromQuery, Required] string login)
 		{
 			var user = await _userService.GetUserByLoginAsync(login);
-			return user != null ? Ok(user) : NotFound();
+			return user != null ?
+				Ok(new List<object?>
+				{
+					user.Name,
+					user.Gender,
+					user.Birthday,
+					user.RevokedBy == null
+				}) :
+				NotFound();
 		}
 	}
 }
