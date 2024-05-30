@@ -81,7 +81,7 @@ namespace AtonWebAPI.Controllers
 		{
 			var user = await _userService.GetUserByLoginAsync(login);
 			return user != null ?
-				Ok(new List<object?>
+				Ok(new List<object>
 				{
 					user.Name,
 					user.Gender,

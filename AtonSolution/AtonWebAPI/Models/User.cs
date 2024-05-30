@@ -12,7 +12,7 @@ namespace AtonWebAPI.Models
 		public required string Password { get => _password; set => _password = value; }
 		public required string Name { get => _name; set => _name = value; }
 		public int Gender { get => _gender; set => _gender = value; }
-		public DateTime? Birthday { get => _birthday; set => _birthday = value; }
+		public DateTime Birthday { get => _birthday; set => _birthday = value; }
 		public bool Admin { get => _admin; set => _admin = value; }
 		
 		public required DateTime CreatedOn { get => _createdOn; set => _createdOn = value; }
@@ -30,7 +30,7 @@ namespace AtonWebAPI.Models
 		private string _password = null!;
 		private string _name = null!;
 		private int _gender = 2;
-		private DateTime? _birthday;
+		private DateTime _birthday;
 		private bool _admin = false;
 
 		private DateTime _createdOn;
