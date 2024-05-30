@@ -51,6 +51,10 @@ namespace AtonWebAPI.Controllers
 			{
 				return StatusCode(StatusCodes.Status403Forbidden, "You don't have permission to assign Administrator status to a new user");
 			}
+			else if (await _userService.hasUserWithRequiredLoginAsync(registration.Login))
+			{
+				return Conflict("User with such login already exists");
+			}
 
 			var user = registration.CreateUserByGivenData(creatorLogin);
 
