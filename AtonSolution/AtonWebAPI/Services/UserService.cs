@@ -12,8 +12,15 @@ namespace AtonWebAPI.Services
 			_context = context;
 		}
 
-		public async Task<bool> hasUserWithRequiredLoginAsync(string login) =>
+		public async Task<bool> HasUserWithRequiredLoginAsync(string login) =>
 			await _context.Users.AnyAsync(x => x.Login == login);
+
+		public async void UpdateUserDataAsync(User user, string name, int gender, DateTime birthday)
+		{
+			user.Name = name;
+			user.Gender = gender;
+			user.Birthday = birthday;
+		}
 
 		public async Task<List<User>> GetUsersAsync()
 		{

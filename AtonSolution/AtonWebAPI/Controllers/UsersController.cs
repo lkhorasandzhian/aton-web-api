@@ -51,7 +51,7 @@ namespace AtonWebAPI.Controllers
 			{
 				return StatusCode(StatusCodes.Status403Forbidden, "You don't have permission to assign Administrator status to a new user");
 			}
-			else if (await _userService.hasUserWithRequiredLoginAsync(registration.Login))
+			else if (await _userService.HasUserWithRequiredLoginAsync(registration.Login))
 			{
 				return Conflict("User with such login already exists");
 			}
@@ -61,6 +61,37 @@ namespace AtonWebAPI.Controllers
 			await _userService.AddUserAsync(user);
 
 			return CreatedAtAction(nameof(RequestByLogin), new { id = user.Guid }, user);
+		}
+
+		[Authorize(Roles = "User")]
+		[HttpPut("Change_profile_data/{selectedUserLogin}")]
+		public async Task<ActionResult> ChangeProfileData(
+			[FromRoute, Required] string selectedUserLogin,
+			[FromQuery, Required] string name,
+			[FromQuery, Required] int gender,
+			[FromQuery, Required] DateTime birthday
+			)
+		{
+			string? currentUserLogin = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+			if (string.IsNullOrEmpty(currentUserLogin))
+			{
+				return Unauthorized("Unable to identify the updater of the user");
+			}
+			else if (!await _userService.HasUserWithRequiredLoginAsync(selectedUserLogin))
+			{
+				return NotFound();
+			}
+			else if (!User.IsInRole("Administrator") && currentUserLogin != selectedUserLogin)
+			{
+				return StatusCode(StatusCodes.Status403Forbidden, "You do not have permission to change someone else's data");
+			}
+
+			User selectedUser = (await _userService.GetUserByLoginAsync(currentUserLogin))!;
+
+			_userService.UpdateUserDataAsync(selectedUser, name, gender, birthday);
+
+			return Ok();
 		}
 
 		/// <summary>
