@@ -46,12 +46,17 @@ namespace AtonWebAPI
 					return AuthenticateResult.Fail("Invalid Username or Password");
 				}
 
-				var claims = new[]
+				var claims = new List<Claim>()
 				{
-					new Claim(ClaimTypes.NameIdentifier, user.Login),
-					new Claim(ClaimTypes.Name, user.Name),
-					new Claim(ClaimTypes.Role, user.Admin ? "Administrator" : "User")
+					new(ClaimTypes.NameIdentifier, user.Login),
+					new(ClaimTypes.Name, user.Name),
+					new(ClaimTypes.Role, "User")
 				};
+
+				if (user.Admin)
+				{
+					claims.Add(new(ClaimTypes.Role, "Administrator"));
+				}
 
 				var identity = new ClaimsIdentity(claims, Scheme.Name);
 				var principal = new ClaimsPrincipal(identity);
