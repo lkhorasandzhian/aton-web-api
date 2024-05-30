@@ -60,6 +60,16 @@ namespace AtonWebAPI.Controllers
 		}
 
 		/// <summary>
+		/// 5) Запрос списка всех активных (отсутствует RevokedOn) пользователей.
+		/// Список отсортирован по CreatedOn (доступно админам).
+		/// </summary>
+		/// <returns> Отсортированный список активных пользователей. </returns>
+		[Authorize(Roles = "Administrator")]
+		[HttpGet("Request_all_active_users")]
+		public async Task<ActionResult<List<User>>> RequestAllActiveUsers() =>
+			await _userService.GetActiveUsersAsync();
+
+		/// <summary>
 		/// 6) Запрос пользователя по логину. В списке должны быть имя, пол,
 		/// дата рождения и статус активный или нет (доступно админам).
 		/// </summary>
