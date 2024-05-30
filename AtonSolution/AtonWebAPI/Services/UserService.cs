@@ -34,5 +34,8 @@ namespace AtonWebAPI.Services
 
 		public async Task<User?> GetUserByLoginAsync(string? login) =>
 			await _context.Users.SingleOrDefaultAsync(u => u.Login == login);
+
+		public async Task<User?> GetUserByLoginAndPasswordAsync(string? login, string? password) =>
+			await _context.Users.SingleOrDefaultAsync(u => u.Login == login && u.Password == password);
 	}
 }

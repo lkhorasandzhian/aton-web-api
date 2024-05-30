@@ -9,5 +9,6 @@ namespace AtonWebAPI.Services
 		Task<User?> AuthenticateAsync(string? login, string? password);
 		Task<int> AddUserAsync(User user);
 		Task<User?> GetUserByLoginAsync(string? login);
+		Task<User?> GetUserByLoginAndPasswordAsync(string? login, string? password);
 	}
 }

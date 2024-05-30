@@ -90,5 +90,25 @@ namespace AtonWebAPI.Controllers
 				}) :
 				NotFound();
 		}
+
+		[Authorize(Roles = "User")]
+		[HttpGet("Request_personal_profile")]
+		public async Task<ActionResult<User>> RequestPersonalProfile(
+			[FromQuery, Required] string login,
+			[FromQuery, Required, DataType(DataType.Password)] string password
+			)
+		{
+			string currentUserLogin = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+			User currentUser = (await _userService.GetUserByLoginAsync(currentUserLogin))!;
+
+			User? requestedUser = await _userService.GetUserByLoginAndPasswordAsync(login, password);
+
+			if (requestedUser == null || currentUser.Login != login || currentUser.Password != password)
+			{
+				return NotFound();
+			}
+
+			return Ok(requestedUser);
+		}
 	}
 }
