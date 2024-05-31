@@ -289,5 +289,33 @@ namespace AtonWebAPI.Controllers
 
 			return Ok();
 		}
+
+		/// <summary>
+		/// 10) Восстановление пользователя - очистка 
+		/// полей (RevokedOn, RevokedBy) (доступно админам).
+		/// </summary>
+		/// <param name="login"> Логин пользователя, которого требуется восстановить. </param>
+		/// <returns> Статус операции. </returns>
+		[Authorize(Roles = "Administrator")]
+		[HttpPut("Restore_user/{login}")]
+		public async Task<ActionResult> RestoreUser([FromRoute, Required] string login)
+		{
+			var user = await _userService.GetUserByLoginAsync(login);
+
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			if (user.RevokedOn == null && user.RevokedBy == null)
+			{
+				return BadRequest("User is already active");
+			}
+
+			user.RevokedOn = null;
+			user.RevokedBy = null;
+
+			return Ok("User has been restored successfully");
+		}
 	}
 }
