@@ -22,6 +22,12 @@ namespace AtonWebAPI.Services
 			user.Birthday = birthday;
 		}
 
+		public void UpdateUserPassword(User user, string password) =>
+			user.Password = password;
+
+		public void UpdateUserLogin(User user, string login) =>
+			user.Login = login;
+
 		public async Task<List<User>> GetUsersAsync()
 		{
 			return await _context.Users.ToListAsync();

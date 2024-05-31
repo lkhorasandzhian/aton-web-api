@@ -89,6 +89,66 @@ namespace AtonWebAPI.Controllers
 			return Ok();
 		}
 
+		[Authorize(Roles = "User")]
+		[HttpPut("Change_password/{selectedUserLogin}")]
+		public async Task<ActionResult> ChangeProfileData(
+			[FromRoute, Required] string selectedUserLogin,
+			[FromQuery, Required, DataType(DataType.Password)] string password
+			)
+		{
+			// Selected User - пользователь, которому меняют данные профиля.
+			User? selectedUser = await _userService.GetUserByLoginAsync(selectedUserLogin);
+
+			// Current User - текущий авторизованный пользователь, производящий изменения.
+			string currentUserLogin = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+
+			if (selectedUser == null)
+			{
+				return NotFound();
+			}
+			else if (!User.IsInRole("Administrator") &&
+				(currentUserLogin != selectedUserLogin || selectedUser.RevokedOn.HasValue))
+			{
+				return StatusCode(StatusCodes.Status403Forbidden, "You do not have permission to change someone else's password");
+			}
+
+			_userService.UpdateUserPassword(selectedUser, password);
+
+			return Ok();
+		}
+
+		[Authorize(Roles = "User")]
+		[HttpPut("Change_login/{selectedUserLogin}")]
+		public async Task<ActionResult> ChangeLogin(
+			[FromRoute, Required] string selectedUserLogin,
+			[FromQuery, Required] string newUserLogin
+			)
+		{
+			// Selected User - пользователь, которому меняют данные профиля.
+			User? selectedUser = await _userService.GetUserByLoginAsync(selectedUserLogin);
+
+			// Current User - текущий авторизованный пользователь, производящий изменения.
+			string currentUserLogin = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+
+			if (selectedUser == null)
+			{
+				return NotFound();
+			}
+			else if (!User.IsInRole("Administrator") &&
+				(currentUserLogin != selectedUserLogin || selectedUser.RevokedOn.HasValue))
+			{
+				return StatusCode(StatusCodes.Status403Forbidden, "You do not have permission to change someone else's password");
+			}
+			else if (await _userService.HasUserWithRequiredLoginAsync(newUserLogin))
+			{
+				return Conflict("This login is already taken.");
+			}
+
+			_userService.UpdateUserLogin(selectedUser, newUserLogin);
+
+			return Ok();
+		}
+
 		/// <summary>
 		/// 5) Запрос списка всех активных (отсутствует RevokedOn) пользователей.
 		/// Список отсортирован по CreatedOn (доступно админам).

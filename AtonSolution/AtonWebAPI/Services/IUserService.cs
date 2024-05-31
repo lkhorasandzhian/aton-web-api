@@ -6,6 +6,8 @@ namespace AtonWebAPI.Services
 	{
 		Task<bool> HasUserWithRequiredLoginAsync(string login);
 		void UpdateUserData(User user, string name, int gender, DateTime? birthday);
+		void UpdateUserPassword(User user, string password);
+		void UpdateUserLogin(User user, string login);
 		Task<List<User>> GetUsersAsync();
 		Task<List<User>> GetActiveUsersAsync();
 		Task<User?> AuthenticateAsync(string? login, string? password);
