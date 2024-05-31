@@ -264,5 +264,30 @@ namespace AtonWebAPI.Controllers
 
 			return await _userService.GetUsersOverSpecifiedAgeAsync(age);
 		}
+
+		/// <summary>
+		/// 9) Удаление пользователя по логину полное или мягкое (при мягком удалении
+		/// должна происходить простановка RevokedOn и RevokedBy). (доступно админам) 
+		/// </summary>
+		/// <param name="login"></param>
+		/// <param name="isHardDelete"> true - полное удаление из БД,
+		/// false - мягкое удаление через маркировку Revoked. </param>
+		/// <returns> Статус операции. </returns>
+		[Authorize(Roles = "Administrator")]
+		[HttpDelete]
+		public async Task<ActionResult> DeleteUser([FromQuery, Required] string login, [FromQuery, Required] bool isHardDelete)
+		{
+			// Current User - текущий авторизованный администратор, производящий удаление.
+			string currentAdminLogin = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+
+			if (!await _userService.HasUserWithRequiredLoginAsync(login))
+			{
+				return NotFound();
+			}
+
+			await _userService.DeleteUserAsync(login, isHardDelete, currentAdminLogin);
+
+			return Ok();
+		}
 	}
 }

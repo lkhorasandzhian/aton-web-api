@@ -70,5 +70,22 @@ namespace AtonWebAPI.Services
 
 		public async Task<List<User>?> GetUsersOverSpecifiedAgeAsync(int age) =>
 			await _context.Users.Where(u => u.Birthday.HasValue && DateTime.Compare(u.Birthday.Value, DateTime.Now.AddYears(-(age + 1))) < 0).ToListAsync();
+
+		public async Task<int> DeleteUserAsync(string login, bool isHardDelete, string adminLogin)
+		{
+			var user = (await _context.Users.SingleOrDefaultAsync(u => u.Login == login))!;
+
+            if (isHardDelete)
+            {
+                _context.Users.Remove(user);
+            }
+			else
+			{
+				user.RevokedOn = DateTime.Now;
+				user.RevokedBy = adminLogin;
+			}
+
+			return await _context.SaveChangesAsync();
+		}
 	}
 }

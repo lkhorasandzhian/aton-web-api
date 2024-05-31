@@ -16,5 +16,6 @@ namespace AtonWebAPI.Services
 		Task<User?> GetUserByLoginAsync(string? login);
 		Task<User?> GetUserByLoginAndPasswordAsync(string? login, string? password);
 		Task<List<User>?> GetUsersOverSpecifiedAgeAsync(int age);
+		Task<int> DeleteUserAsync(string login, bool isHardDelete, string adminLogin);
 	}
 }
