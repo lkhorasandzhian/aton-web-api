@@ -59,6 +59,15 @@ namespace AtonWebAPI.Controllers
 			return CreatedAtAction(nameof(RequestByLogin), new { id = user.Guid }, user);
 		}
 
+		/// <summary>
+		/// 2) Изменение имени, пола или даты рождения пользователя (может менять либо администратор,
+		/// либо  лично пользователь, если он активен (отсутствует RevokedOn)).
+		/// </summary>
+		/// <param name="selectedUserLogin"> Логин пользователя, чей профиль требуется обновить. </param>
+		/// <param name="name"> Обновлённое имя. </param>
+		/// <param name="gender"> Обновлённый пол. </param>
+		/// <param name="birthday"> Обновлённая дата рождения. </param>
+		/// <returns> Статус операции. </returns>
 		[Authorize(Roles = "User")]
 		[HttpPut("Change_profile_data/{selectedUserLogin}")]
 		public async Task<ActionResult> ChangeProfileData(
@@ -96,6 +105,13 @@ namespace AtonWebAPI.Controllers
 			return Ok();
 		}
 
+		/// <summary>
+		/// 3) Изменение пароля (пароль может менять либо администратор,
+		/// либо лично пользователь, если он активен (отсутствует RevokedOn)). 
+		/// </summary>
+		/// <param name="selectedUserLogin"> Логин пользователя, чей пароль требуется обновить. </param>
+		/// <param name="password"> Обновлённый пароль. </param>
+		/// <returns> Статус операции. </returns>
 		[Authorize(Roles = "User")]
 		[HttpPut("Change_password/{selectedUserLogin}")]
 		public async Task<ActionResult> ChangeProfileData(
@@ -106,7 +122,7 @@ namespace AtonWebAPI.Controllers
 			string password
 			)
 		{
-			// Selected User - пользователь, которому меняют данные профиля.
+			// Selected User - пользователь, которому меняют пароль.
 			User? selectedUser = await _userService.GetUserByLoginAsync(selectedUserLogin);
 
 			// Current User - текущий авторизованный пользователь, производящий изменения.
@@ -127,6 +143,14 @@ namespace AtonWebAPI.Controllers
 			return Ok();
 		}
 
+		/// <summary>
+		/// 4) Изменение логина (логин может менять либо администратор,
+		/// либо лично пользователь, если  он активен (отсутствует RevokedOn),
+		/// логин должен оставаться уникальным).
+		/// </summary>
+		/// <param name="selectedUserLogin"> Логин пользователя, чей логин требуется обновить. </param>
+		/// <param name="newUserLogin"> Обновлённый логин. </param>
+		/// <returns> Статус операции. </returns>
 		[Authorize(Roles = "User")]
 		[HttpPut("Change_login/{selectedUserLogin}")]
 		public async Task<ActionResult> ChangeLogin(
@@ -137,7 +161,7 @@ namespace AtonWebAPI.Controllers
 			string newUserLogin
 			)
 		{
-			// Selected User - пользователь, которому меняют данные профиля.
+			// Selected User - пользователь, которому меняют логин.
 			User? selectedUser = await _userService.GetUserByLoginAsync(selectedUserLogin);
 
 			// Current User - текущий авторизованный пользователь, производящий изменения.
