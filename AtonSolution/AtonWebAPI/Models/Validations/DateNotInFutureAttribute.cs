@@ -17,7 +17,7 @@ namespace AtonWebAPI.Models.Validations
 				return new ValidationResult("Birthday cannot be in the future");
 			}
 
-			return new ValidationResult("Birthday must be written in correct format");
+			return ValidationResult.Success;
 		}
 	}
 }

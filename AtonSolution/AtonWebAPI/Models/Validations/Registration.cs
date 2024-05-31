@@ -36,7 +36,7 @@ namespace AtonWebAPI.Models.Validations
 
 		[DataType(DataType.Date, ErrorMessage = "Invalid date format")]
 		[DateNotInFuture]
-		public required DateTime? Birthday { get; set; }
+		public DateTime? Birthday { get; set; }
 
 		public bool Admin { get; set; } = false;
 	}

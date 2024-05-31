@@ -43,11 +43,7 @@ namespace AtonWebAPI.Controllers
 
 			string? creatorLogin = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-			if (string.IsNullOrEmpty(creatorLogin))
-			{
-				return Unauthorized("Unable to identify the creator of the user");
-			}
-			else if (registration.Admin && !User.IsInRole("Administrator"))
+			if (registration.Admin && !User.IsInRole("Administrator"))
 			{
 				return StatusCode(StatusCodes.Status403Forbidden, "You don't have permission to assign Administrator status to a new user");
 			}
@@ -56,7 +52,7 @@ namespace AtonWebAPI.Controllers
 				return Conflict("User with such login already exists");
 			}
 
-			var user = registration.CreateUserByGivenData(creatorLogin);
+			var user = registration.CreateUserByGivenData(creatorLogin ?? string.Empty);
 
 			await _userService.AddUserAsync(user);
 
