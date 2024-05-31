@@ -62,10 +62,17 @@ namespace AtonWebAPI.Controllers
 		[Authorize(Roles = "User")]
 		[HttpPut("Change_profile_data/{selectedUserLogin}")]
 		public async Task<ActionResult> ChangeProfileData(
-			[FromRoute, Required] string selectedUserLogin,
-			[FromQuery, Required] string name,
-			[FromQuery, Required] int gender,
-			[FromQuery] DateTime? birthday
+			[FromRoute, Required]
+			string selectedUserLogin,
+
+			[FromQuery, Required, RegularExpression("^[a-zA-Zа-яА-Я]*$", ErrorMessage = "Name must contain only Latin letters and Russian letters")]
+			string name,
+
+			[FromQuery, Required, Range(0, 2, ErrorMessage = "Gender value must be in range [0;2] (0 - female, 1 - male, 2 - undefined)")]
+			int gender,
+
+			[FromQuery, DataType(DataType.Date, ErrorMessage = "Invalid date format"), DateNotInFuture]
+			DateTime? birthday
 			)
 		{
 			// Selected User - пользователь, которому меняют данные профиля.
@@ -92,8 +99,11 @@ namespace AtonWebAPI.Controllers
 		[Authorize(Roles = "User")]
 		[HttpPut("Change_password/{selectedUserLogin}")]
 		public async Task<ActionResult> ChangeProfileData(
-			[FromRoute, Required] string selectedUserLogin,
-			[FromQuery, Required, DataType(DataType.Password)] string password
+			[FromRoute, Required]
+			string selectedUserLogin,
+
+			[FromQuery, Required, DataType(DataType.Password), RegularExpression("^[a-zA-Z0-9]*$", ErrorMessage = "Password must contain only Latin letters and numbers")]
+			string password
 			)
 		{
 			// Selected User - пользователь, которому меняют данные профиля.
@@ -120,8 +130,11 @@ namespace AtonWebAPI.Controllers
 		[Authorize(Roles = "User")]
 		[HttpPut("Change_login/{selectedUserLogin}")]
 		public async Task<ActionResult> ChangeLogin(
-			[FromRoute, Required] string selectedUserLogin,
-			[FromQuery, Required] string newUserLogin
+			[FromRoute, Required]
+			string selectedUserLogin,
+
+			[FromQuery, Required, RegularExpression("^[a-zA-Z0-9]*$", ErrorMessage = "Login must contain only Latin letters and numbers")]
+			string newUserLogin
 			)
 		{
 			// Selected User - пользователь, которому меняют данные профиля.
