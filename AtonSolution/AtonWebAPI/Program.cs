@@ -4,6 +4,7 @@ using AtonWebAPI.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,10 @@ builder.Services.AddSwaggerGen(options =>
 			Array.Empty<string>()
 		}
 	});
+
+	var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+	var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+	options.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
