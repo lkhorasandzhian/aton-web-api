@@ -72,22 +72,21 @@ namespace AtonWebAPI.Controllers
 			[FromQuery] DateTime? birthday
 			)
 		{
-			string? currentUserLogin = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			// Selected User - пользователь, которому меняют данные профиля.
+			User? selectedUser = await _userService.GetUserByLoginAsync(selectedUserLogin);
 
-			if (string.IsNullOrEmpty(currentUserLogin))
-			{
-				return Unauthorized("Unable to identify the updater of the user");
-			}
-			else if (!await _userService.HasUserWithRequiredLoginAsync(selectedUserLogin))
+			// Current User - текущий авторизованный пользователь, производящий изменения.
+			string currentUserLogin = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+
+			if (selectedUser == null)
 			{
 				return NotFound();
 			}
-			else if (!User.IsInRole("Administrator") && currentUserLogin != selectedUserLogin)
+			else if (!User.IsInRole("Administrator") &&
+				(currentUserLogin != selectedUserLogin || selectedUser.RevokedOn.HasValue))
 			{
 				return StatusCode(StatusCodes.Status403Forbidden, "You do not have permission to change someone else's data");
 			}
-
-			User selectedUser = (await _userService.GetUserByLoginAsync(currentUserLogin))!;
 
 			_userService.UpdateUserData(selectedUser, name, gender, birthday);
 
