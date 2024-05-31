@@ -28,6 +28,32 @@ namespace AtonWebAPI.Controllers
 #endif
 
 		/// <summary>
+		/// Метод OPTIONS для предоставления информации о поддерживаемых методах и возможностях сервера.
+		/// </summary>
+		/// <returns> Список поддерживаемых методов и возможностей сервера. </returns>
+		[HttpGet("options")]
+		[HttpOptions]
+		[AllowAnonymous]
+		public IActionResult GetAvailableMethods()
+		{
+			Response.Headers.Append("Allow", "GET, POST, PUT, DELETE, HEAD, OPTIONS");
+			return Ok();
+		}
+
+		/// <summary>
+		/// Метод HEAD для проверки доступности ресурса.
+		/// </summary>
+		/// <returns> Заголовки ответа без тела ответа. </returns>
+		[HttpHead("api/users")]
+		public IActionResult Head()
+		{
+			// Просто возвращаем заголовки ответа без тела ответа
+			Response.Headers.Append("X-Resource-Type", "User");
+			Response.Headers.Append("X-Resource-Author", "AtonWebAPI");
+			return Ok();
+		}
+
+		/// <summary>
 		/// 1) Создание пользователя по логину, паролю, имени, полу и дате рождения
 		/// + указание будет ли пользователь админом (доступно админам).
 		/// </summary>
