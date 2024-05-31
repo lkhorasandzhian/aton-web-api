@@ -101,7 +101,8 @@ namespace AtonWebAPI.Controllers
 			}
 
 			_userService.UpdateUserData(selectedUser, name, gender, birthday);
-
+			
+			_userService.MarkUserAsModified(selectedUser, currentUserLogin);
 			return Ok();
 		}
 
@@ -140,6 +141,7 @@ namespace AtonWebAPI.Controllers
 
 			_userService.UpdateUserPassword(selectedUser, password);
 
+			_userService.MarkUserAsModified(selectedUser, currentUserLogin);
 			return Ok();
 		}
 
@@ -183,6 +185,7 @@ namespace AtonWebAPI.Controllers
 
 			_userService.UpdateUserLogin(selectedUser, newUserLogin);
 
+			_userService.MarkUserAsModified(selectedUser, currentUserLogin);
 			return Ok();
 		}
 

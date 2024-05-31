@@ -15,6 +15,12 @@ namespace AtonWebAPI.Services
 		public async Task<bool> HasUserWithRequiredLoginAsync(string login) =>
 			await _context.Users.AnyAsync(x => x.Login == login);
 
+		public void MarkUserAsModified(User user, string editorLogin)
+		{
+			user.ModifiedOn = DateTime.Now;
+			user.ModifiedBy = editorLogin;
+		}
+
 		public void UpdateUserData(User user, string? name, int? gender, DateTime? birthday)
 		{
 			if (name != null)
