@@ -69,7 +69,7 @@ namespace AtonWebAPI.Controllers
 			[FromRoute, Required] string selectedUserLogin,
 			[FromQuery, Required] string name,
 			[FromQuery, Required] int gender,
-			[FromQuery, Required] DateTime birthday
+			[FromQuery] DateTime? birthday
 			)
 		{
 			string? currentUserLogin = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -89,7 +89,7 @@ namespace AtonWebAPI.Controllers
 
 			User selectedUser = (await _userService.GetUserByLoginAsync(currentUserLogin))!;
 
-			_userService.UpdateUserDataAsync(selectedUser, name, gender, birthday);
+			_userService.UpdateUserData(selectedUser, name, gender, birthday);
 
 			return Ok();
 		}
@@ -116,7 +116,7 @@ namespace AtonWebAPI.Controllers
 		{
 			var user = await _userService.GetUserByLoginAsync(login);
 			return user != null ?
-				Ok(new List<object>
+				Ok(new List<object?>
 				{
 					user.Name,
 					user.Gender,

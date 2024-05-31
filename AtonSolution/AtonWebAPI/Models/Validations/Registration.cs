@@ -34,10 +34,9 @@ namespace AtonWebAPI.Models.Validations
 		[Range(0, 2, ErrorMessage = "Gender value must be in range [0;2] (0 - female, 1 - male, 2 - undefined)")]
 		public required int Gender { get; set; } = 2;
 
-		[Required(ErrorMessage = "Birthday is required")]
 		[DataType(DataType.Date, ErrorMessage = "Invalid date format")]
 		[DateNotInFuture]
-		public required DateTime Birthday { get; set; }
+		public required DateTime? Birthday { get; set; }
 
 		public bool Admin { get; set; } = false;
 	}

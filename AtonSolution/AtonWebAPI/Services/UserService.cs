@@ -15,7 +15,7 @@ namespace AtonWebAPI.Services
 		public async Task<bool> HasUserWithRequiredLoginAsync(string login) =>
 			await _context.Users.AnyAsync(x => x.Login == login);
 
-		public async void UpdateUserDataAsync(User user, string name, int gender, DateTime birthday)
+		public void UpdateUserData(User user, string name, int gender, DateTime? birthday)
 		{
 			user.Name = name;
 			user.Gender = gender;
@@ -49,6 +49,6 @@ namespace AtonWebAPI.Services
 			await _context.Users.SingleOrDefaultAsync(u => u.Login == login && u.Password == password);
 
 		public async Task<List<User>?> GetUsersOverSpecifiedAgeAsync(int age) =>
-			await _context.Users.Where(u => DateTime.Compare(u.Birthday, DateTime.Now.AddYears(-(age + 1))) < 0).ToListAsync();
+			await _context.Users.Where(u => u.Birthday.HasValue && DateTime.Compare(u.Birthday.Value, DateTime.Now.AddYears(-(age + 1))) < 0).ToListAsync();
 	}
 }
