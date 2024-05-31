@@ -20,7 +20,12 @@ namespace AtonWebAPI.Controllers
 		}
 
 #if DEBUG
-		[HttpGet]
+		/// <summary>
+		/// Получить список всех пользователей (и активных, и неактивных).
+		/// </summary>
+		/// <remarks> Доступно только в режиме DEBUG. </remarks>
+		/// <returns> Список всех пользователей. </returns>
+		[HttpGet("debug/get-all-users")]
 		public async Task<ActionResult<List<User>>> GetUsers()
 		{
 			return await _userService.GetUsersAsync();
@@ -31,8 +36,7 @@ namespace AtonWebAPI.Controllers
 		/// Метод OPTIONS для предоставления информации о поддерживаемых методах и возможностях сервера.
 		/// </summary>
 		/// <returns> Список поддерживаемых методов и возможностей сервера. </returns>
-		[HttpGet("options")]
-		[HttpOptions]
+		[HttpOptions("options")]
 		[AllowAnonymous]
 		public IActionResult GetAvailableMethods()
 		{
@@ -44,10 +48,10 @@ namespace AtonWebAPI.Controllers
 		/// Метод HEAD для проверки доступности ресурса.
 		/// </summary>
 		/// <returns> Заголовки ответа без тела ответа. </returns>
-		[HttpHead("api/users")]
+		[HttpHead("head")]
+		[AllowAnonymous]
 		public IActionResult Head()
 		{
-			// Просто возвращаем заголовки ответа без тела ответа
 			Response.Headers.Append("X-Resource-Type", "User");
 			Response.Headers.Append("X-Resource-Author", "AtonWebAPI");
 			return Ok();
@@ -59,7 +63,7 @@ namespace AtonWebAPI.Controllers
 		/// </summary>
 		/// <param name="registration"> Введенные пользователем регистрационные данные из Swagger UI. </param>
 		/// <returns> Зарегистрированный пользовательский профиль. </returns>
-		[HttpPost("Register")]
+		[HttpPost("register")]
 		public async Task<ActionResult<User>> Register([FromForm] Registration registration)
 		{
 			if (!ModelState.IsValid)
@@ -95,7 +99,7 @@ namespace AtonWebAPI.Controllers
 		/// <param name="birthday"> Обновлённая дата рождения. </param>
 		/// <returns> Статус операции. </returns>
 		[Authorize(Roles = "User")]
-		[HttpPut("Change_profile_data/{selectedUserLogin}")]
+		[HttpPut("change/profile-data/{selectedUserLogin}")]
 		public async Task<ActionResult> ChangeProfileData(
 			[FromRoute, Required]
 			string selectedUserLogin,
@@ -140,7 +144,7 @@ namespace AtonWebAPI.Controllers
 		/// <param name="password"> Обновлённый пароль. </param>
 		/// <returns> Статус операции. </returns>
 		[Authorize(Roles = "User")]
-		[HttpPut("Change_password/{selectedUserLogin}")]
+		[HttpPut("change/password/{selectedUserLogin}")]
 		public async Task<ActionResult> ChangeProfileData(
 			[FromRoute, Required]
 			string selectedUserLogin,
@@ -180,7 +184,7 @@ namespace AtonWebAPI.Controllers
 		/// <param name="newUserLogin"> Обновлённый логин. </param>
 		/// <returns> Статус операции. </returns>
 		[Authorize(Roles = "User")]
-		[HttpPut("Change_login/{selectedUserLogin}")]
+		[HttpPut("change/login/{selectedUserLogin}")]
 		public async Task<ActionResult> ChangeLogin(
 			[FromRoute, Required]
 			string selectedUserLogin,
@@ -221,7 +225,7 @@ namespace AtonWebAPI.Controllers
 		/// </summary>
 		/// <returns> Отсортированный список активных пользователей. </returns>
 		[Authorize(Roles = "Administrator")]
-		[HttpGet("Request_all_active_users")]
+		[HttpGet("request/all-active-users")]
 		public async Task<ActionResult<List<User>>> RequestAllActiveUsers() =>
 			await _userService.GetActiveUsersAsync();
 
@@ -232,7 +236,7 @@ namespace AtonWebAPI.Controllers
 		/// <param name="login"> Запрошенный логин. </param>
 		/// <returns> Имя, пол, дата рождения, статус активности.  </returns>
 		[Authorize(Roles = "Administrator")]
-		[HttpGet("Request_by_login")]
+		[HttpGet("request/by-login")]
 		public async Task<ActionResult<User>> RequestByLogin([FromQuery, Required] string login)
 		{
 			var user = await _userService.GetUserByLoginAsync(login);
@@ -255,7 +259,7 @@ namespace AtonWebAPI.Controllers
 		/// <param name="password"> Пароль запрошенного пользователя. </param>
 		/// <returns> Личный профиль пользователя. </returns>
 		[Authorize(Roles = "User")]
-		[HttpGet("Request_personal_profile")]
+		[HttpGet("request/personal-profile")]
 		public async Task<ActionResult<User>> RequestPersonalProfile(
 			[FromQuery, Required] string login,
 			[FromQuery, Required, DataType(DataType.Password)] string password
@@ -280,7 +284,7 @@ namespace AtonWebAPI.Controllers
 		/// <param name="age"> Запрошенный возраст. </param>
 		/// <returns> Пользователи старше указанного возраста. </returns>
 		[Authorize(Roles = "Administrator")]
-		[HttpGet("Request_users_over_specified_age")]
+		[HttpGet("request/users-over-specified-age")]
 		public async Task<ActionResult<List<User>?>> RequestUsersOverSpecifiedAge([FromQuery, Required] int age)
 		{
 			if (age <= 0)
@@ -300,7 +304,7 @@ namespace AtonWebAPI.Controllers
 		/// false - мягкое удаление через маркировку Revoked. </param>
 		/// <returns> Статус операции. </returns>
 		[Authorize(Roles = "Administrator")]
-		[HttpDelete]
+		[HttpDelete("delete")]
 		public async Task<ActionResult> DeleteUser([FromQuery, Required] string login, [FromQuery, Required] bool isHardDelete)
 		{
 			// Current User - текущий авторизованный администратор, производящий удаление.
@@ -323,7 +327,7 @@ namespace AtonWebAPI.Controllers
 		/// <param name="login"> Логин пользователя, которого требуется восстановить. </param>
 		/// <returns> Статус операции. </returns>
 		[Authorize(Roles = "Administrator")]
-		[HttpPut("Restore_user/{login}")]
+		[HttpPut("restore/user/{login}")]
 		public async Task<ActionResult> RestoreUser([FromRoute, Required] string login)
 		{
 			var user = await _userService.GetUserByLoginAsync(login);
