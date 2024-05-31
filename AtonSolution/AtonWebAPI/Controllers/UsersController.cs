@@ -65,11 +65,11 @@ namespace AtonWebAPI.Controllers
 			[FromRoute, Required]
 			string selectedUserLogin,
 
-			[FromQuery, Required, RegularExpression("^[a-zA-Zа-яА-Я]*$", ErrorMessage = "Name must contain only Latin letters and Russian letters")]
-			string name,
+			[FromQuery, RegularExpression("^[a-zA-Zа-яА-Я]*$", ErrorMessage = "Name must contain only Latin letters and Russian letters")]
+			string? name,
 
-			[FromQuery, Required, Range(0, 2, ErrorMessage = "Gender value must be in range [0;2] (0 - female, 1 - male, 2 - undefined)")]
-			int gender,
+			[FromQuery, Range(0, 2, ErrorMessage = "Gender value must be in range [0;2] (0 - female, 1 - male, 2 - undefined)")]
+			int? gender,
 
 			[FromQuery, DataType(DataType.Date, ErrorMessage = "Invalid date format"), DateNotInFuture]
 			DateTime? birthday

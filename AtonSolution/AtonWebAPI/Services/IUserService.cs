@@ -5,7 +5,7 @@ namespace AtonWebAPI.Services
 	public interface IUserService
 	{
 		Task<bool> HasUserWithRequiredLoginAsync(string login);
-		void UpdateUserData(User user, string name, int gender, DateTime? birthday);
+		void UpdateUserData(User user, string? name, int? gender, DateTime? birthday);
 		void UpdateUserPassword(User user, string password);
 		void UpdateUserLogin(User user, string login);
 		Task<List<User>> GetUsersAsync();
